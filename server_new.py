@@ -65,20 +65,6 @@ class Server(threading.Thread):
         self.connections.remove(conn)
 
 
-class Command(threading.Thread):
-    def __init__(self):
-        super().__init__()
-
-    def run(self):
-        while True:
-            ipt = input('')
-            if ipt == '/quit':
-                print('Closing all connections...')
-                for conn in server.connections:
-                    conn.sc.close()
-                print('Shutting down Server...')
-                os._exit(0)
-
 HOST = '127.0.0.1'
 PORT = 8000
 
