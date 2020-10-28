@@ -9,23 +9,14 @@ import tkinter as tk
 
 
 class Send(threading.Thread):
-    """
-    Sending thread listens for user input from the command line.
 
-    Attributes:
-        sock (socket.socket): The connected socket object.
-        name (str): The username provided by the user.
-    """
     def __init__(self, sock, name):
         super().__init__()
         self.sock = sock
         self.name = name
 
     def run(self):
-        """
-        Listens for user input from the command line only and sends it to the server.
-        Typing 'QUIT' will close the connection and exit the application.
-        """
+
         while True:
             print('{}: '.format(self.name), end='')
             sys.stdout.flush()
@@ -46,14 +37,7 @@ class Send(threading.Thread):
 
 
 class Receive(threading.Thread):
-    """
-    Receiving thread listens for incoming messages from the server.
 
-    Attributes:
-        sock (socket.socket): The connected socket object.
-        name (str): The username provided by the user.
-        messages (tk.Listbox): The tk.Listbox object containing all messages displayed on the GUI.
-    """
     def __init__(self, sock, name):
         super().__init__()
         self.sock = sock
@@ -61,10 +45,7 @@ class Receive(threading.Thread):
         self.messages = None
 
     def run(self):
-        """
-        Receives data from the server and displays it in the GUI.
-        Always listens for incoming data until either end has closed the socket.
-        """
+
         while True:
             message = self.sock.recv(1024).decode('utf-8')
 
@@ -79,16 +60,7 @@ class Receive(threading.Thread):
                 os._exit(0)
 
 class Client:
-    """
-    Supports management of client-server connections and integration with the GUI.
 
-    Attributes:
-        host (str): The IP address of the server's listening socket.
-        port (int): The port number of the server's listening socket.
-        sock (socket.socket): The connected socket object.
-        name (str): The username of the client.
-        messages (tk.Listbox): The tk.Listbox object containing all messages displayed on the GUI.
-    """
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -97,13 +69,7 @@ class Client:
         self.messages = None
     
     def start(self):
-        """
-        Establishes the client-server connection. Gathers user input for the username,
-        creates and starts the Send and Receive threads, and notifies other connected clients.
 
-        Returns:
-            A Receive object representing the receiving thread.
-        """
         print('Trying to connect to {}:{}...'.format(self.host, self.port))
         self.sock.connect((self.host, self.port))
         print('Successfully connected to {}:{}'.format(self.host, self.port))
@@ -130,13 +96,7 @@ class Client:
 
 
 def main(host, port):
-    """
-    Initializes and runs the GUI application.
 
-    Args:
-        host (str): The IP address of the server's listening socket.
-        port (int): The port number of the server's listening socket.
-    """
     client = Client(host, port)
     client.start()
 
