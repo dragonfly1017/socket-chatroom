@@ -24,12 +24,12 @@ class Send(threading.Thread):
 
             # Type 'QUIT' to leave the chatroom
             if message == '/quit':
-                self.sock.sendall('Server: {} has left the chat.'.format(self.name).encode('ascii'))
+                self.sock.sendall('Server: {} has left the chat.'.format(self.name).encode('utf-8'))
                 break
             
             # Send message to server for broadcasting
             else:
-                self.sock.sendall('{}: {}'.format(self.name, message).encode('ascii'))
+                self.sock.sendall('{}: {}'.format(self.name, message).encode('utf-8'))
         
         print('\nQuitting...')
         self.sock.close()
@@ -47,13 +47,21 @@ class Receive(threading.Thread):
     def run(self):
 
         while True:
-            message = self.sock.recv(1024).decode('utf-8')
 
-            if message:
-                print('\r{}\n{}: '.format(message, self.name), end = '')
-            
-            else:
-                # Server has closed the socket, exit the program
+            try:
+                message = self.sock.recv(1024).decode('utf-8')
+
+                if message:
+                    print('\r{}\n{}: '.format(message, self.name), end = '')
+                
+                else:
+                    # Server has closed the socket, exit the program
+                    print('\nOh no, we have lost connection to the server!')
+                    print('\nQuitting...')
+                    self.sock.close()
+                    os._exit(0)
+                    
+            except ConnectionResetError:
                 print('\nOh no, we have lost connection to the server!')
                 print('\nQuitting...')
                 self.sock.close()
@@ -88,7 +96,7 @@ class Client:
         send.start()
         receive.start()
 
-        self.sock.sendall('Server: {} has joined the chat. Say hi!'.format(self.name).encode('ascii'))
+        self.sock.sendall('Server: {} has joined the chat. Say hi!'.format(self.name).encode('utf-8'))
         print("\rAll set! Leave the chatroom anytime by typing '/quit'\n")
         print('{}: '.format(self.name), end = '')
 

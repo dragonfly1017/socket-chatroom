@@ -1,6 +1,7 @@
 import threading
 import socket
 import os
+import sys
 
 
 
@@ -13,13 +14,18 @@ class ServerSocket(threading.Thread):
     
     def run(self):
         while True:
-            clientMessage = self.sc.recv(1024).decode('utf-8')
             
-            if clientMessage:   
-                print('{}: {!r}'.format(self.sockname,clientMessage))
-                self.server.broadcast(clientMessage, self.sockname)
-
-            else:
+            try:
+                clientMessage = self.sc.recv(1024).decode('utf-8')
+                if clientMessage:   
+                    print('{}: {!r}'.format(self.sockname,clientMessage))
+                    self.server.broadcast(clientMessage, self.sockname)
+                else:
+                    print('{} has closed the connection'.format(self.sockname))
+                    self.sc.close()
+                    self.server.remove_connection(self)
+                    return
+            except ConnectionResetError:
                 print('{} has closed the connection'.format(self.sockname))
                 self.sc.close()
                 self.server.remove_connection(self)
@@ -42,7 +48,7 @@ class Server(threading.Thread):
         sock.bind((self.host,self.port))
         sock.listen(1)
         print('Listening at', sock.getsockname())
-
+        
         while True:
             sc, sockname = sock.accept()
             print('Accepted a new connection form {} to {}'.format(sc.getpeername(), sc.getsockname()))
