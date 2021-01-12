@@ -3,7 +3,15 @@ import socket
 import os
 import sys
 
-
+class Command(threading.Thread):
+    def __init__(self,ipt):
+        super().__init__()
+        self.ipt = ipt
+    def run(self):
+        while True:
+            ipt = input()
+            if ipt == '/quit':
+                break
 
 class ServerSocket(threading.Thread):
     def __init__(self, sc, sockname, server):
